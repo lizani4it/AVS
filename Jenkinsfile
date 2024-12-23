@@ -1,21 +1,25 @@
 pipeline {
     agent any
-    environment {
-        DOCKER_IMAGE = "rgz-test_app:latest"
-        CONTAINER_NAME = "test_app"
-    }
+
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                git 'https://github.com/lizani4it/AVS.git'  // Укажите ваш репозиторий
             }
         }
-        stage('Deploy Application') {
+        stage('Build') {
             steps {
                 script {
-                    sh '''
-                        ls -la
-                    '''
+                    sh 'docker build -t avs-image .'
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    sh 'docker stop avs-container || true'
+                    sh 'docker rm avs-container || true'
+                    sh 'docker run -d --name avs-container -p 8080:8080 avs-image'
                 }
             }
         }
