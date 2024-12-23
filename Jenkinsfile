@@ -1,25 +1,26 @@
 pipeline {
-    agent any
-
+    agent {
+        docker {
+            image 'node:16-alpine'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
+    environment {
+        DOCKER_IMAGE = "rgr-test_app:latest"
+        CONTAINER_NAME = "test_app"
+    }
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/lizani4it/AVS.git'  // Укажите ваш репозиторий
+                checkout scm
             }
         }
-        stage('Build') {
+        stage('Deploy Application') {
             steps {
                 script {
-                    sh 'docker build -t avs-image .'
-                }
-            }
-        }
-        stage('Deploy') {
-            steps {
-                script {
-                    sh 'docker stop avs-container || true'
-                    sh 'docker rm avs-container || true'
-                    sh 'docker run -d --name avs-container -p 8080:8080 avs-image'
+                    sh '''
+                        npm install
+                    '''
                 }
             }
         }
