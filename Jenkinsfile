@@ -1,5 +1,9 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
     environment {
         DOCKER_IMAGE = "rgr-test_app:latest"
         CONTAINER_NAME = "test_app"
